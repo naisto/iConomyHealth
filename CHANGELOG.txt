@@ -1,0 +1,17 @@
+===== iConomyHealth ChangeLog =====
+created by aPunch
+
+=== 0.1 ===
+-Initial release
+
+=== 0.1.1 ===
+-fixed ArrayIndexOutOfBoundsException errors
+-added configurable setting in config.yml that allows you to choose whether to 
+ pay per heart or per use of the command
+ 
+=== TO-DO ===
+-add a price list
+-configure prices in-game?
+-Other?
+
+-Special thanks to Nijikokun and Coelho for their great iConomy plugin!
