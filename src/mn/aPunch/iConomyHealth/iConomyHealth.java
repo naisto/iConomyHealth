@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
@@ -58,22 +59,42 @@ public class iConomyHealth extends JavaPlugin {
 	}
 
 	private void sendHelp(Player player) {
-		player.sendMessage(ChatColor.GREEN + "===== iConomyHealth v0.1.1 =====");
+		player.sendMessage(ChatColor.GREEN + "===== iConomyHealth v0.2.1 =====");
 		player.sendMessage(ChatColor.GOLD
 				+ "/iHeal [player] [hp (1-20)] - heal players");
 		player.sendMessage(ChatColor.GOLD
 				+ "/iHurt [player] [hp (1-20)] - damage players");
+		player.sendMessage(ChatColor.GOLD
+				+ "/iList - list the costs of healing/hurting");
 		player.sendMessage(ChatColor.GREEN + "===== created by aPunch =====");
 	}
 
 	public boolean onCommand(CommandSender sender, Command command,
 			String commandLabel, String[] args) {
 		String commandName = command.getName();
+		String currency = com.nijiko.coelho.iConomy.iConomy.getBank()
+				.getCurrency();
+		int heal = config.getInt("heal-price", healPrice);
+		int hurt = config.getInt("hurt-price", hurtPrice);
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
 			if (commandName.equalsIgnoreCase("iHelp")) {
 				if (iConomyHealthPermissions.canHelp(player) || (player.isOp())) {
 					sendHelp(player);
+					return true;
+				} else {
+					player.sendMessage(ChatColor.RED
+							+ "[iConomyHealth] You do not have permission to use that command.");
+				}
+			}
+			if (commandName.equalsIgnoreCase("iList")) {
+				if (iConomyHealthPermissions.canHelp(player) || (player.isOp())) {
+					player.sendMessage(ChatColor.GREEN
+							+ "===== iConomyHealth Prices =====");
+					player.sendMessage(ChatColor.GOLD + "Healing -- "
+							+ ChatColor.WHITE + healPrice + " " + currency);
+					player.sendMessage(ChatColor.GOLD + "Hurting -- "
+							+ ChatColor.WHITE + hurtPrice + " " + currency);
 					return true;
 				} else {
 					player.sendMessage(ChatColor.RED
@@ -89,8 +110,6 @@ public class iConomyHealth extends JavaPlugin {
 						int health = receiver.getHealth();
 						String addHealth = args[1];
 						int newHealth = Integer.parseInt(addHealth);
-						String currency = com.nijiko.coelho.iConomy.iConomy
-								.getBank().getCurrency();
 						if (args.length >= 2) {
 							if (players.size() >= 1) {
 								if (com.nijiko.coelho.iConomy.iConomy.getBank()
@@ -99,12 +118,9 @@ public class iConomyHealth extends JavaPlugin {
 											.getBank().getAccount(
 													player.getName());
 									double balance = account.getBalance();
-									int healPrice = config.getInt("heal-price",
-											10);
-									boolean payPerHP = config.getBoolean(
-											"pay-per-healthpoint", true);
-									if (balance >= healPrice) {
-										if (payPerHP == true) {
+									if (balance >= heal) {
+										if (config.getBoolean(
+												"pay-per-healthpoint", true)) {
 											account.subtract(healPrice
 													* newHealth);
 											receiver.setHealth(health
@@ -169,8 +185,6 @@ public class iConomyHealth extends JavaPlugin {
 						int health = receiver.getHealth();
 						String subtractHealth = args[1];
 						int newHealth = Integer.parseInt(subtractHealth);
-						String currency = com.nijiko.coelho.iConomy.iConomy
-								.getBank().getCurrency();
 						if (args.length >= 2) {
 							if (players.size() >= 1) {
 								if (com.nijiko.coelho.iConomy.iConomy.getBank()
@@ -179,32 +193,35 @@ public class iConomyHealth extends JavaPlugin {
 											.getBank().getAccount(
 													player.getName());
 									double balance = account.getBalance();
-									int hurtPrice = config.getInt("hurt-price",
-											25);
-									boolean payPerHP = config.getBoolean("pay-per-healthpoint", true);
-									if (balance >= hurtPrice) {
-										if(payPerHP == true){
-											account.subtract(hurtPrice + newHealth);
-											receiver.setHealth(health - newHealth);
+									boolean payPerHP = config.getBoolean(
+											"pay-per-healthpoint", true);
+									if (balance >= hurt) {
+										if (payPerHP == true) {
+											account.subtract(hurtPrice
+													+ newHealth);
+											receiver.setHealth(health
+													- newHealth);
 											player.sendMessage(ChatColor.GREEN
 													+ "[iConomyHealth] You have hurt "
-													+ receiver.getName() + " for "
-													+ hurtPrice * newHealth + " " + currency
-													+ ".");
+													+ receiver.getName()
+													+ " for " + hurtPrice
+													* newHealth + " "
+													+ currency + ".");
 											receiver.sendMessage(ChatColor.GREEN
 													+ "[iConomyHealth] You have been hurt by "
 													+ player.getName() + ".");
-										}else{
-										account.subtract(hurtPrice);
-										receiver.setHealth(health - newHealth);
-										player.sendMessage(ChatColor.GREEN
-												+ "[iConomyHealth] You have hurt "
-												+ receiver.getName() + " for "
-												+ hurtPrice + " " + currency
-												+ ".");
-										receiver.sendMessage(ChatColor.GREEN
-												+ "[iConomyHealth] You have been hurt by "
-												+ player.getName() + ".");
+										} else {
+											account.subtract(hurtPrice);
+											receiver.setHealth(health
+													- newHealth);
+											player.sendMessage(ChatColor.GREEN
+													+ "[iConomyHealth] You have hurt "
+													+ receiver.getName()
+													+ " for " + hurtPrice + " "
+													+ currency + ".");
+											receiver.sendMessage(ChatColor.GREEN
+													+ "[iConomyHealth] You have been hurt by "
+													+ player.getName() + ".");
 										}
 
 									} else {
@@ -240,6 +257,15 @@ public class iConomyHealth extends JavaPlugin {
 	public void onEnable() {
 		Server = getServer();
 		iConomyHealthPermissions.initialize(getServer());
+		// check if iConomy is detected
+		Plugin test = getServer().getPluginManager().getPlugin("iConomy");
+		if (test != null) {
+			iConomy = ((iConomy) test);
+		} else {
+			log.info("[iConomyHealth] iConomy not detected. Disabling plugin.");
+			getServer().getPluginManager().disablePlugin(this);
+		}
+		// check if config.yml is there...if so, load it; if not, create it
 		config = getConfiguration();
 		if (!new File(getDataFolder(), "config.yml").exists()) {
 			defaultConfig();

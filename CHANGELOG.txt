@@ -9,8 +9,16 @@ created by aPunch
 -added configurable setting in config.yml that allows you to choose whether to 
  pay per heart or per use of the command
  
+=== 0.2 ===
+-added /iList command (and node 'iConomyHealth.list'
+-changed node 'iConomyHealth.damage' to 'iConomyHealth.hurt'
+-a bit of code cleanup
+
+=== 0.2.1 ===
+-fixed accounts going negative
+
+ 
 === TO-DO ===
--add a price list
 -configure prices in-game?
 -Other?
 

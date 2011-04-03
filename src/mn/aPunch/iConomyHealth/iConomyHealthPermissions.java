@@ -50,7 +50,15 @@ public class iConomyHealthPermissions {
 
 	public static boolean canHurt(Player player) {
 		if (permissionsEnabled) {
-			return permission(player, "iConomyHealth.damage");
+			return permission(player, "iConomyHealth.hurt");
+		} else {
+			return true;
+		}
+	}
+
+	public static boolean canList(Player player) {
+		if (permissionsEnabled) {
+			return permission(player, "iConomyHealth.list");
 		} else {
 			return true;
 		}
