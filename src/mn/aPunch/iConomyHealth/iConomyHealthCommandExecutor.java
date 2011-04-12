@@ -13,12 +13,8 @@ import com.nijiko.coelho.iConomy.system.Account;
 
 public class iConomyHealthCommandExecutor implements CommandExecutor {
 	public iConomyHealth plugin;
-	String currency = iConomy.getBank().getCurrency();
 	public String noPermissionsMessage = ChatColor.RED
 			+ "[iConomyHealth] You do not have permission to use that command.";
-	public String notEnoughMoneyMessage = ChatColor.RED
-			+ "[iConomyHealth] You do not have enough " + currency
-			+ " to do that.";
 
 	public iConomyHealthCommandExecutor(iConomyHealth instance) {
 		plugin = instance;
@@ -31,6 +27,10 @@ public class iConomyHealthCommandExecutor implements CommandExecutor {
 				iConomyHealth.healPrice);
 		int hurtPrice = plugin.config.getInt("hurt-price",
 				iConomyHealth.hurtPrice);
+		String currency = iConomy.getBank().getCurrency();
+		String notEnoughMoneyMessage = ChatColor.RED
+				+ "[iConomyHealth] You do not have enough " + currency
+				+ " to do that.";
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
 			if (commandName.equalsIgnoreCase("iHelp")) {
@@ -197,7 +197,7 @@ public class iConomyHealthCommandExecutor implements CommandExecutor {
 								if (payPerHP == true) {
 									if (balance >= hurtPrice * newHealth) {
 										account.subtract(hurtPrice * newHealth);
-										receiver.setHealth(health + newHealth);
+										receiver.setHealth(health - newHealth);
 										player.sendMessage(ChatColor.GREEN
 												+ "[iConomyHealth] You have hurt "
 												+ receiver.getName() + " for "
@@ -210,7 +210,7 @@ public class iConomyHealthCommandExecutor implements CommandExecutor {
 								} else if (payPerHP == false) {
 									if (balance >= hurtPrice) {
 										account.subtract(hurtPrice);
-										receiver.setHealth(health + newHealth);
+										receiver.setHealth(health - newHealth);
 										player.sendMessage(ChatColor.GREEN
 												+ "[iConomyHealth] You have hurt "
 												+ receiver.getName() + " for "

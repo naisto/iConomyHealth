@@ -1,6 +1,6 @@
 name: iConomyHealth
 main: mn.aPunch.iConomyHealth.iConomyHealth
-version: 0.3
+version: 0.3.1
 commands:
   iHelp:
     description: The iConomyHealth help menu.
