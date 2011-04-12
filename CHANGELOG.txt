@@ -20,6 +20,11 @@ created by aPunch
 === 0.3 ===
 -failing to specify a player and amount of HP now automatically heals/hurts 
  yourself to the max HP level
+-works with Permissions v2.6
+
+=== 0.3.1 ===
+-fixed NPE
+-fixed bug where using /iHurt would actually heal the player
 
  
 === TO-DO ===
