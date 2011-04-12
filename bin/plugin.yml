@@ -1,0 +1,24 @@
+name: iConomyHealth
+main: mn.aPunch.iConomyHealth.iConomyHealth
+version: 0.2.1
+commands:
+  iHelp:
+    description: The iConomyHealth help menu.
+    usage: |
+           Incorrect usage of /iHelp. Examples:
+           /<command> 
+  iHeal:
+    description: Heal a player.
+    usage: |
+           Incorrect usage of /iHeal. Examples:
+           /<command> [player] [healthpoints (1-20)]
+  iHurt:
+    description: Damage a player.
+    usage: |
+           Incorrect usage of /iHurt. Examples:
+           /<command> [player] [healthpoints (1-20)]
+  iList:
+    description: The iConomyHealth price menu.
+    usage: |
+           Incorrect usage of /iList. Examples:
+           /<command> 

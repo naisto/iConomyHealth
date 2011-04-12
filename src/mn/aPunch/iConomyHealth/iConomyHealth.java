@@ -1,26 +1,22 @@
 package mn.aPunch.iConomyHealth;
 
 import java.io.File;
-import java.util.List;
 import java.util.logging.Logger;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
-import org.bukkit.ChatColor;
 import org.bukkit.Server;
 
 import com.nijiko.coelho.iConomy.iConomy;
-import com.nijiko.coelho.iConomy.system.Account;
 
 public class iConomyHealth extends JavaPlugin {
 	public Logger log = Logger.getLogger("Minecraft");
+	iConomyHealthCommandExecutor commandExecutor = new iConomyHealthCommandExecutor(
+			this);
 	private static iConomy iConomy = null;
-	private static Server Server = null;
+	private static Server server = null;
 	Configuration config;
 
 	public static int healPrice = 10;
@@ -42,7 +38,7 @@ public class iConomyHealth extends JavaPlugin {
 	}
 
 	public static Server getBukkitServer() {
-		return Server;
+		return server;
 	}
 
 	public static iConomy getiConomy() {
@@ -58,204 +54,15 @@ public class iConomyHealth extends JavaPlugin {
 		return true;
 	}
 
-	private void sendHelp(Player player) {
-		player.sendMessage(ChatColor.GREEN + "===== iConomyHealth v0.2.1 =====");
-		player.sendMessage(ChatColor.GOLD
-				+ "/iHeal [player] [hp (1-20)] - heal players");
-		player.sendMessage(ChatColor.GOLD
-				+ "/iHurt [player] [hp (1-20)] - damage players");
-		player.sendMessage(ChatColor.GOLD
-				+ "/iList - list the costs of healing/hurting");
-		player.sendMessage(ChatColor.GREEN + "===== created by aPunch =====");
-	}
-
-	public boolean onCommand(CommandSender sender, Command command,
-			String commandLabel, String[] args) {
-		String commandName = command.getName();
-		String currency = com.nijiko.coelho.iConomy.iConomy.getBank()
-				.getCurrency();
-		int heal = config.getInt("heal-price", healPrice);
-		int hurt = config.getInt("hurt-price", hurtPrice);
-		if (sender instanceof Player) {
-			Player player = (Player) sender;
-			if (commandName.equalsIgnoreCase("iHelp")) {
-				if (iConomyHealthPermissions.canHelp(player) || (player.isOp())) {
-					sendHelp(player);
-					return true;
-				} else {
-					player.sendMessage(ChatColor.RED
-							+ "[iConomyHealth] You do not have permission to use that command.");
-				}
-			}
-			if (commandName.equalsIgnoreCase("iList")) {
-				if (iConomyHealthPermissions.canHelp(player) || (player.isOp())) {
-					player.sendMessage(ChatColor.GREEN
-							+ "===== iConomyHealth Prices =====");
-					player.sendMessage(ChatColor.GOLD + "Healing -- "
-							+ ChatColor.WHITE + healPrice + " " + currency);
-					player.sendMessage(ChatColor.GOLD + "Hurting -- "
-							+ ChatColor.WHITE + hurtPrice + " " + currency);
-					return true;
-				} else {
-					player.sendMessage(ChatColor.RED
-							+ "[iConomyHealth] You do not have permission to use that command.");
-				}
-			}
-			try {
-				if (commandName.equalsIgnoreCase("iHeal")) {
-					if (iConomyHealthPermissions.canHeal(player)
-							|| (player.isOp())) {
-						List<Player> players = getServer().matchPlayer(args[0]);
-						Player receiver = players.get(0);
-						int health = receiver.getHealth();
-						String addHealth = args[1];
-						int newHealth = Integer.parseInt(addHealth);
-						if (args.length >= 2) {
-							if (players.size() >= 1) {
-								if (com.nijiko.coelho.iConomy.iConomy.getBank()
-										.hasAccount(player.getName())) {
-									Account account = com.nijiko.coelho.iConomy.iConomy
-											.getBank().getAccount(
-													player.getName());
-									double balance = account.getBalance();
-									if (balance >= heal) {
-										if (config.getBoolean(
-												"pay-per-healthpoint", true)) {
-											account.subtract(healPrice
-													* newHealth);
-											receiver.setHealth(health
-													+ newHealth);
-											player.sendMessage(ChatColor.GREEN
-													+ "[iConomyHealth] You have healed "
-													+ receiver.getName()
-													+ " for " + healPrice
-													* newHealth + " "
-													+ currency + ".");
-											receiver.sendMessage(ChatColor.GREEN
-													+ "[iConomyHealth] You have been healed by "
-													+ player.getName() + ".");
-
-										} else {
-											account.subtract(healPrice);
-											receiver.setHealth(health
-													+ newHealth);
-											player.sendMessage(ChatColor.GREEN
-													+ "[iConomyHealth] You have healed "
-													+ receiver.getName()
-													+ " for " + healPrice + " "
-													+ currency + ".");
-											receiver.sendMessage(ChatColor.GREEN
-													+ "[iConomyHealth] You have been healed by "
-													+ player.getName() + ".");
-										}
-									} else {
-										player.sendMessage(ChatColor.RED
-												+ "[iConomyHealth] You do not have enough "
-												+ currency + " to heal "
-												+ receiver.getName() + ".");
-									}
-
-								} else {
-									player.sendMessage(ChatColor.RED
-											+ "[iConomyHealth] You do not have an account, so how do you expect to buy anything?!");
-								}
-
-							} else {
-								player.setHealth(health + newHealth);
-								player.sendMessage(ChatColor.GREEN
-										+ "[iConomyHealth] You have healed yourself for "
-										+ healPrice + currency + ".");
-							}
-						}
-					}
-				} else {
-					player.sendMessage(ChatColor.RED
-							+ "[iConomyHealth] You do not have permission to use that command.");
-				}
-			} catch (ArrayIndexOutOfBoundsException ex) {
-				player.sendMessage(ChatColor.RED
-						+ "[iConomyHealth] You must specify a player and an amount of health-points.");
-			}
-			try {
-				if (commandName.equalsIgnoreCase("iHurt")) {
-					if (iConomyHealthPermissions.canHurt(player)
-							|| (player.isOp())) {
-						List<Player> players = getServer().matchPlayer(args[0]);
-						Player receiver = players.get(0);
-						int health = receiver.getHealth();
-						String subtractHealth = args[1];
-						int newHealth = Integer.parseInt(subtractHealth);
-						if (args.length >= 2) {
-							if (players.size() >= 1) {
-								if (com.nijiko.coelho.iConomy.iConomy.getBank()
-										.hasAccount(player.getName())) {
-									Account account = com.nijiko.coelho.iConomy.iConomy
-											.getBank().getAccount(
-													player.getName());
-									double balance = account.getBalance();
-									boolean payPerHP = config.getBoolean(
-											"pay-per-healthpoint", true);
-									if (balance >= hurt) {
-										if (payPerHP == true) {
-											account.subtract(hurtPrice
-													+ newHealth);
-											receiver.setHealth(health
-													- newHealth);
-											player.sendMessage(ChatColor.GREEN
-													+ "[iConomyHealth] You have hurt "
-													+ receiver.getName()
-													+ " for " + hurtPrice
-													* newHealth + " "
-													+ currency + ".");
-											receiver.sendMessage(ChatColor.GREEN
-													+ "[iConomyHealth] You have been hurt by "
-													+ player.getName() + ".");
-										} else {
-											account.subtract(hurtPrice);
-											receiver.setHealth(health
-													- newHealth);
-											player.sendMessage(ChatColor.GREEN
-													+ "[iConomyHealth] You have hurt "
-													+ receiver.getName()
-													+ " for " + hurtPrice + " "
-													+ currency + ".");
-											receiver.sendMessage(ChatColor.GREEN
-													+ "[iConomyHealth] You have been hurt by "
-													+ player.getName() + ".");
-										}
-
-									} else {
-										player.sendMessage(ChatColor.RED
-												+ "[iConomyHealth] You do not have enough "
-												+ currency + " to hurt "
-												+ receiver.getName() + ".");
-									}
-								} else {
-									player.sendMessage(ChatColor.RED
-											+ "[iConomyHealth] You do not have an account, so how do you expect to buy anything?!");
-								}
-							} else {
-								player.setHealth(health - newHealth);
-								player.sendMessage(ChatColor.GREEN
-										+ "[iConomyHealth] You have damaged yourself for "
-										+ hurtPrice + currency + ".");
-							}
-						}
-					} else {
-						player.sendMessage(ChatColor.RED
-								+ "[iConomyHealth] You do not have permission to use that command.");
-					}
-				}
-			} catch (ArrayIndexOutOfBoundsException ex) {
-				player.sendMessage(ChatColor.RED
-						+ "[iConomyHealth] You must specify a player and an amount of health-points.");
-			}
-		}
-		return true;
-	}
-
 	public void onEnable() {
-		Server = getServer();
+		server = getServer();
+		// register commands
+		getCommand("iHelp").setExecutor(commandExecutor);
+		getCommand("iList").setExecutor(commandExecutor);
+		getCommand("iHeal").setExecutor(commandExecutor);
+		getCommand("iHurt").setExecutor(commandExecutor);
+
+		// set up Permissions
 		iConomyHealthPermissions.initialize(getServer());
 		// check if iConomy is detected
 		Plugin test = getServer().getPluginManager().getPlugin("iConomy");

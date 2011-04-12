@@ -1,0 +1,29 @@
+===== iConomyHealth ChangeLog =====
+created by aPunch
+
+=== 0.1 ===
+-Initial release
+
+=== 0.1.1 ===
+-fixed ArrayIndexOutOfBoundsException errors
+-added configurable setting in config.yml that allows you to choose whether to 
+ pay per heart or per use of the command
+ 
+=== 0.2 ===
+-added /iList command (and node 'iConomyHealth.list'
+-changed node 'iConomyHealth.damage' to 'iConomyHealth.hurt'
+-a bit of code cleanup
+
+=== 0.2.1 ===
+-fixed accounts going negative
+
+=== 0.3 ===
+-failing to specify a player and amount of HP now automatically heals/hurts 
+ yourself to the max HP level
+
+ 
+=== TO-DO ===
+-configure prices in-game?
+-Other?
+
+-Special thanks to Nijikokun and Coelho for their great iConomy plugin!
