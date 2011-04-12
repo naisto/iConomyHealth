@@ -13,8 +13,7 @@ import com.nijiko.coelho.iConomy.iConomy;
 
 public class iConomyHealth extends JavaPlugin {
 	public Logger log = Logger.getLogger("Minecraft");
-	iConomyHealthCommandExecutor commandExecutor = new iConomyHealthCommandExecutor(
-			this);
+	iConomyHealthCommandExecutor commandExecutor;
 	private static iConomy iConomy = null;
 	private static Server server = null;
 	Configuration config;
@@ -57,6 +56,7 @@ public class iConomyHealth extends JavaPlugin {
 	public void onEnable() {
 		server = getServer();
 		// register commands
+		commandExecutor = new iConomyHealthCommandExecutor(this);
 		getCommand("iHelp").setExecutor(commandExecutor);
 		getCommand("iList").setExecutor(commandExecutor);
 		getCommand("iHeal").setExecutor(commandExecutor);

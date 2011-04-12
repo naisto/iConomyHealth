@@ -18,7 +18,7 @@ public class iConomyHealthCommandExecutor implements CommandExecutor {
 			+ "[iConomyHealth] You do not have permission to use that command.";
 	public String notEnoughMoneyMessage = ChatColor.RED
 			+ "[iConomyHealth] You do not have enough " + currency
-			+ "to do that.";
+			+ " to do that.";
 
 	public iConomyHealthCommandExecutor(iConomyHealth instance) {
 		plugin = instance;
@@ -57,19 +57,18 @@ public class iConomyHealthCommandExecutor implements CommandExecutor {
 			} else if (commandName.equalsIgnoreCase("iHeal")) {
 				if ((iConomyHealthPermissions.canHeal(player))
 						|| (player.isOp())) {
-					List<Player> players = plugin.getServer().matchPlayer(
-							args[0]);
-					Player receiver = players.get(0);
-					int health = receiver.getHealth();
-					String addHealth = args[1];
-					int newHealth = Integer.parseInt(addHealth);
 					Account account = iConomy.getBank().getAccount(
 							player.getName());
 					double balance = account.getBalance();
 					boolean payPerHP = plugin.config.getBoolean(
 							"pay-per-healthpoint", true);
-					int emptyHearts = 20 - health;
 					if (args.length == 2) {
+						List<Player> players = plugin.getServer().matchPlayer(
+								args[0]);
+						Player receiver = players.get(0);
+						int health = receiver.getHealth();
+						String addHealth = args[1];
+						int newHealth = Integer.parseInt(addHealth);
 						if (players.size() == 1) {
 							if (iConomy.getBank().hasAccount(player.getName())) {
 								if (payPerHP == true) {
@@ -108,6 +107,11 @@ public class iConomyHealthCommandExecutor implements CommandExecutor {
 									+ "[iConomyHealth] You can only heal one player at a time.");
 						}
 					} else if (args.length == 1) {
+						List<Player> players = plugin.getServer().matchPlayer(
+								args[0]);
+						Player receiver = players.get(0);
+						int health = receiver.getHealth();
+						int emptyHearts = 20 - health;
 						if (players.size() == 1) {
 							if (payPerHP == true) {
 								if (balance >= (healPrice * emptyHearts)) {
@@ -116,7 +120,7 @@ public class iConomyHealthCommandExecutor implements CommandExecutor {
 									player.sendMessage(ChatColor.GREEN
 											+ "[iConomyHealth] You have healed "
 											+ receiver.getName() + " for "
-											+ healPrice * newHealth + " "
+											+ healPrice * emptyHearts + " "
 											+ currency + ".");
 									receiver.sendMessage(ChatColor.GREEN
 											+ "[iConomyHealth] You have been healed by "
@@ -147,10 +151,12 @@ public class iConomyHealthCommandExecutor implements CommandExecutor {
 									+ "[iConomyHealth] You must specify a player.");
 						}
 					} else if (args.length == 0) {
+						int health = player.getHealth();
+						int emptyHearts = 20 - health;
 						if (payPerHP == true) {
 							if (balance >= healPrice * emptyHearts) {
 								account.subtract(healPrice * emptyHearts);
-								receiver.setHealth(20);
+								player.setHealth(20);
 								player.sendMessage(ChatColor.GREEN
 										+ "[iConomyHealth] You have healed yourself for "
 										+ healPrice * emptyHearts + " "
@@ -161,7 +167,7 @@ public class iConomyHealthCommandExecutor implements CommandExecutor {
 						} else if (payPerHP == false) {
 							if (balance >= healPrice) {
 								account.subtract(healPrice);
-								receiver.setHealth(20);
+								player.setHealth(20);
 								player.sendMessage(ChatColor.GREEN
 										+ "[iConomyHealth] You have healed yourself for "
 										+ healPrice + " " + currency + ".");
@@ -174,18 +180,18 @@ public class iConomyHealthCommandExecutor implements CommandExecutor {
 			} else if (commandName.equalsIgnoreCase("iHurt")) {
 				if ((iConomyHealthPermissions.canHurt(player))
 						|| (player.isOp())) {
-					List<Player> players = plugin.getServer().matchPlayer(
-							args[0]);
-					Player receiver = players.get(0);
-					int health = receiver.getHealth();
-					String subtractHealth = args[1];
-					int newHealth = Integer.parseInt(subtractHealth);
 					Account account = iConomy.getBank().getAccount(
 							player.getName());
 					double balance = account.getBalance();
 					boolean payPerHP = plugin.config.getBoolean(
 							"pay-per-healthpoint", true);
 					if (args.length == 2) {
+						List<Player> players = plugin.getServer().matchPlayer(
+								args[0]);
+						Player receiver = players.get(0);
+						String subtractHealth = args[1];
+						int newHealth = Integer.parseInt(subtractHealth);
+						int health = receiver.getHealth();
 						if (players.size() == 1) {
 							if (iConomy.getBank().hasAccount(player.getName())) {
 								if (payPerHP == true) {
@@ -197,7 +203,7 @@ public class iConomyHealthCommandExecutor implements CommandExecutor {
 												+ receiver.getName() + " for "
 												+ hurtPrice * newHealth + " "
 												+ currency + ".");
-										receiver.sendMessage(ChatColor.GREEN
+										receiver.sendMessage(ChatColor.RED
 												+ "[iConomyHealth] You have been hurt by "
 												+ player.getName() + ".");
 									}
@@ -210,7 +216,7 @@ public class iConomyHealthCommandExecutor implements CommandExecutor {
 												+ receiver.getName() + " for "
 												+ healPrice + " " + currency
 												+ ".");
-										receiver.sendMessage(ChatColor.GREEN
+										receiver.sendMessage(ChatColor.RED
 												+ "[iConomyHealth] You have been hurt by "
 												+ player.getName() + ".");
 									}
@@ -224,6 +230,10 @@ public class iConomyHealthCommandExecutor implements CommandExecutor {
 									+ "[iConomyHealth] You can only hurt one player at a time.");
 						}
 					} else if (args.length == 1) {
+						List<Player> players = plugin.getServer().matchPlayer(
+								args[0]);
+						Player receiver = players.get(0);
+						int health = receiver.getHealth();
 						if (players.size() == 1) {
 							if (payPerHP == true) {
 								if (balance >= (hurtPrice * health)) {
@@ -232,9 +242,9 @@ public class iConomyHealthCommandExecutor implements CommandExecutor {
 									player.sendMessage(ChatColor.GREEN
 											+ "[iConomyHealth] You have killed "
 											+ receiver.getName() + " for "
-											+ hurtPrice * newHealth + " "
+											+ hurtPrice * health + " "
 											+ currency + ".");
-									receiver.sendMessage(ChatColor.GREEN
+									receiver.sendMessage(ChatColor.RED
 											+ "[iConomyHealth] You have been killed by "
 											+ player.getName() + ".");
 								} else {
@@ -248,7 +258,7 @@ public class iConomyHealthCommandExecutor implements CommandExecutor {
 											+ "[iConomyHealth] You have killed "
 											+ receiver.getName() + " for "
 											+ hurtPrice + " " + currency + ".");
-									receiver.sendMessage(ChatColor.GREEN
+									receiver.sendMessage(ChatColor.RED
 											+ "[iConomyHealth] You have been killed by "
 											+ player.getName() + ".");
 								} else {
@@ -263,10 +273,11 @@ public class iConomyHealthCommandExecutor implements CommandExecutor {
 									+ "[iConomyHealth] You must specify a player to hurt.");
 						}
 					} else if (args.length == 0) {
+						int health = player.getHealth();
 						if (payPerHP == true) {
 							if (balance >= hurtPrice * health) {
 								account.subtract(hurtPrice * health);
-								receiver.setHealth(0);
+								player.setHealth(0);
 								player.sendMessage(ChatColor.RED
 										+ "[iConomyHealth] You have killed yourself for "
 										+ hurtPrice * health + " " + currency
@@ -277,7 +288,7 @@ public class iConomyHealthCommandExecutor implements CommandExecutor {
 						} else if (payPerHP == false) {
 							if (balance >= hurtPrice) {
 								account.subtract(hurtPrice);
-								receiver.setHealth(0);
+								player.setHealth(0);
 								player.sendMessage(ChatColor.RED
 										+ "[iConomyHealth] You have killed yourself for "
 										+ healPrice + " " + currency + ".");
