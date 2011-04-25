@@ -26,9 +26,11 @@ created by aPunch
 -fixed NPE
 -fixed bug where using /iHurt would actually heal the player
 
+=== 0.3.2 ===
+-accessor methods are your friend
+-works for CB #716
+
  
 === TO-DO ===
--configure prices in-game?
+-heart-healing in addition to healthpoint-healing
 -Other?
-
--Special thanks to Nijikokun and Coelho for their great iConomy plugin!

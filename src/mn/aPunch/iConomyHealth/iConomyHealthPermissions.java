@@ -10,8 +10,13 @@ import org.bukkit.plugin.Plugin;
 import com.nijikokun.bukkit.Permissions.Permissions;
 
 public class iConomyHealthPermissions {
-	private static Permissions permissionsPlugin;
+	public iConomyHealth plugin;
+	public static Permissions permissionsPlugin;
 	private static boolean permissionsEnabled = false;
+	
+	public iConomyHealthPermissions(iConomyHealth instance) {
+		plugin = instance;
+	}
 
 	public static void initialize(Server server) {
 		Plugin test = server.getPluginManager().getPlugin("Permissions");
@@ -27,12 +32,11 @@ public class iConomyHealthPermissions {
 		}
 	}
 
-	@SuppressWarnings("static-access")
-	private static boolean permission(Player player, String string) {
-		return permissionsPlugin.Security.permission(player, string);
+	private boolean permission(Player player, String string) {
+		return Permissions.Security.permission(player, string);
 	}
 
-	public static boolean canHelp(Player player) {
+	public boolean canHelp(Player player) {
 		if (permissionsEnabled) {
 			return permission(player, "iConomyHealth.help");
 		} else {
@@ -40,7 +44,7 @@ public class iConomyHealthPermissions {
 		}
 	}
 
-	public static boolean canHeal(Player player) {
+	public boolean canHeal(Player player) {
 		if (permissionsEnabled) {
 			return permission(player, "iConomyHealth.heal");
 		} else {
@@ -48,7 +52,7 @@ public class iConomyHealthPermissions {
 		}
 	}
 
-	public static boolean canHurt(Player player) {
+	public boolean canHurt(Player player) {
 		if (permissionsEnabled) {
 			return permission(player, "iConomyHealth.hurt");
 		} else {
@@ -56,7 +60,7 @@ public class iConomyHealthPermissions {
 		}
 	}
 
-	public static boolean canList(Player player) {
+	public boolean canList(Player player) {
 		if (permissionsEnabled) {
 			return permission(player, "iConomyHealth.list");
 		} else {

@@ -13,15 +13,28 @@ import com.nijiko.coelho.iConomy.iConomy;
 
 public class iConomyHealth extends JavaPlugin {
 	public Logger log = Logger.getLogger("Minecraft");
-	iConomyHealthCommandExecutor commandExecutor = new iConomyHealthCommandExecutor(this);
+	iConomyHealthCommandExecutor commandExecutor = new iConomyHealthCommandExecutor(
+			this);
 	private static iConomy iConomy = null;
 	private static Server server = null;
 	Configuration config;
 
-	public static int healPrice = 10;
-	public static int hurtPrice = 25;
-	public static boolean payPerHP = true;
+	private static int healPrice = 10;
+	private static int hurtPrice = 25;
+	private static boolean payPerHP = true;
 
+	public int getHealPrice() {
+		return healPrice;
+	}
+
+	public int getHurtPrice() {
+		return hurtPrice;
+	}
+
+	public boolean payPerHP() {
+		return payPerHP;
+	}
+	
 	private void loadConfig() {
 		config.load();
 		healPrice = config.getInt("heal-price", healPrice);
@@ -60,7 +73,6 @@ public class iConomyHealth extends JavaPlugin {
 		getCommand("iList").setExecutor(commandExecutor);
 		getCommand("iHeal").setExecutor(commandExecutor);
 		getCommand("iHurt").setExecutor(commandExecutor);
-
 		// set up Permissions
 		iConomyHealthPermissions.initialize(getServer());
 		// check if iConomy is detected
@@ -71,7 +83,7 @@ public class iConomyHealth extends JavaPlugin {
 			log.info("[iConomyHealth] iConomy not detected. Disabling plugin.");
 			getServer().getPluginManager().disablePlugin(this);
 		}
-		// check if config.yml is there...if so, load it; if not, create it
+		// check if config.yml is there...if not, create it; load config.yml
 		config = getConfiguration();
 		if (!new File(getDataFolder(), "config.yml").exists()) {
 			defaultConfig();
